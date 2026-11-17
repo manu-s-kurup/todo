@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WorkLog · Daily Tasks</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg>
+        </span>
+        <span class="brand-name">WorkLog</span>
+      </div>
+
+      <nav class="nav" aria-label="Main">
+        <div class="nav-label">Overview</div>
+        <a href="#/dashboard" data-route="dashboard"><span class="ico" data-icon="grid"></span>Dashboard</a>
+        <div class="nav-label">Tasks</div>
+        <a href="#/today" data-route="today"><span class="ico" data-icon="sun"></span>Today<span class="nav-count" id="count-today"></span></a>
+        <a href="#/upcoming" data-route="upcoming"><span class="ico" data-icon="calendar"></span>Upcoming</a>
+        <a href="#/all" data-route="all"><span class="ico" data-icon="list"></span>All tasks</a>
+        <a href="#/completed" data-route="completed"><span class="ico" data-icon="check-circle"></span>Completed</a>
+        <div class="nav-label">Insights</div>
+        <a href="#/reports" data-route="reports"><span class="ico" data-icon="chart"></span>Reports</a>
+        <a href="#/categories" data-route="categories"><span class="ico" data-icon="tag"></span>Categories</a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <button class="btn btn-ghost btn-block" id="theme-toggle" type="button">
+          <span class="ico" data-icon="moon"></span><span>Dark mode</span>
+        </button>
+        <div class="shortcuts"><kbd>N</kbd> new task · <kbd>/</kbd> search</div>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu"><span class="ico" data-icon="menu"></span></button>
+        <div class="page-heading">
+          <h1 id="page-title">Dashboard</h1>
+          <p id="page-subtitle"></p>
+        </div>
+        <div class="topbar-actions">
+          <label class="search">
+            <span class="ico" data-icon="search"></span>
+            <input id="search" type="search" placeholder="Search tasks…" autocomplete="off" aria-label="Search tasks">
+          </label>
+          <button class="btn btn-primary" id="new-task-btn" type="button"><span class="ico" data-icon="plus"></span><span class="hide-sm">New task</span></button>
+        </div>
+      </header>
+
+      <section id="view" class="view" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <dialog id="task-dialog" class="dialog">
+    <form id="task-form" method="dialog" novalidate>
+      <header class="dialog-head">
+        <h2 id="task-dialog-title">New task</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Close"><span class="ico" data-icon="x"></span></button>
+      </header>
+      <div class="dialog-body">
+        <div class="field">
+          <label for="f-title">Title <span class="req">*</span></label>
+          <input id="f-title" name="title" maxlength="200" required placeholder="What needs to be done?">
+        </div>
+        <div class="field">
+          <label for="f-description">Notes</label>
+          <textarea id="f-description" name="description" rows="3" maxlength="5000" placeholder="Details, links, acceptance criteria…"></textarea>
+        </div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="f-category">Category</label>
+            <select id="f-category" name="category_id"></select>
+          </div>
+          <div class="field">
+            <label for="f-priority">Priority</label>
+            <select id="f-priority" name="priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-status">Status</label>
+            <select id="f-status" name="status">
+              <option value="todo">To do</option>
+              <option value="in_progress">In progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="f-task-date">Planned for <span class="req">*</span></label>
+            <input id="f-task-date" name="task_date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="f-due-date">Deadline</label>
+            <input id="f-due-date" name="due_date" type="date">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="f-est">Estimated hours</label>
+            <input id="f-est" name="estimated_hours" type="number" min="0" max="999" step="0.25" placeholder="e.g. 2">
+          </div>
+          <div class="field">
+            <label for="f-spent">Hours spent</label>
+            <input id="f-spent" name="spent_hours" type="number" min="0" max="999" step="0.25" placeholder="0">
+          </div>
+        </div>
+        <p class="form-error" id="task-form-error" role="alert"></p>
+      </div>
+      <footer class="dialog-foot">
+        <button class="btn btn-danger-ghost" type="button" id="task-delete-btn">Delete</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+        <button class="btn btn-primary" type="submit" id="task-save-btn">Save task</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="dialog dialog-sm">
+    <div class="dialog-body">
+      <h2 id="confirm-title">Are you sure?</h2>
+      <p id="confirm-message" class="muted"></p>
+    </div>
+    <footer class="dialog-foot">
+      <span class="spacer"></span>
+      <button class="btn btn-ghost" type="button" id="confirm-cancel">Cancel</button>
+      <button class="btn btn-danger" type="button" id="confirm-ok">Delete</button>
+    </footer>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="assertive"></div>
+
+  <script src="/vendor/chart.js/chart.umd.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

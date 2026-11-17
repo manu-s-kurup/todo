@@ -1,0 +1,22 @@
+﻿{
+  "name": "daily-work-todo",
+  "version": "1.0.0",
+  "description": "Daily work task manager with daily, weekly and monthly reports (PostgreSQL)",
+  "main": "server/index.js",
+  "private": true,
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "chart.js": "^4.6.1",
+    "dotenv": "^18.0.10",
+    "express": "^4.22.3",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1"
+  }
+}
+
