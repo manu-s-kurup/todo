@@ -32,6 +32,14 @@ On first start, the app **creates the database** if it is missing (this needs th
 
 Use `npm run dev` to auto-restart the server when files change.
 
+### Production (pm2 + nginx)
+
+```bash
+pm2 start ecosystem.config.js   # process file: ecosystem.config.js
+```
+
+The full Linux server guide covers PostgreSQL, pm2 startup on boot, nginx reverse proxy with basic auth, HTTPS with certbot, firewall, backups and updates. See [deploy/DEPLOY.md](deploy/DEPLOY.md). The nginx site file is [deploy/nginx/worklog.conf](deploy/nginx/worklog.conf).
+
 ### Configuration (`.env`)
 
 | Variable       | Default     | Description                                       |

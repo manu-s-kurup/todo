@@ -3,14 +3,13 @@ require('dotenv').config({ quiet: true });
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
-const { init } = require('./db');
+const { init, pool } = require('./db');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 
-app.disable('x-powered-by');
-app.use(helmet({
+app.disable('x-powered-by');app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: false,
     directives: {
@@ -50,7 +49,16 @@ app.use((err, req, res, next) => {
 
 init()
   .then(() => {
-    app.listen(PORT, HOST, () => console.log(`Daily Work Todo running at http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`));
+    const server = app.listen(PORT, HOST, () => console.log(`Daily Work Todo running at http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`));
+
+    // Graceful shutdown (pm2 restart/reload/stop sends SIGINT)
+    const shutdown = (signal) => {
+      console.log(`${signal} received, shutting down…`);
+      server.close(() => pool.end().finally(() => process.exit(0)));
+      setTimeout(() => process.exit(1), 8000).unref();
+    };
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
   })
   .catch((err) => {
     console.error('Failed to initialise database:', err.message);
